@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Chamber of Knowledge - Interactive CV Map</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -19,6 +19,8 @@
             color: #2a1a11;
             overflow-x: hidden;
             position: relative;
+            width: 100%;
+            min-height: 100vh;
         }
 
         .magical-bg {
@@ -216,26 +218,28 @@
         }
 
         .map-wrapper {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 20px;
+            width: 100%;
+            min-height: 100vh;
+            padding: 10px;
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            overflow: auto;
         }
 
         .map-container {
             background-image: url('https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/Harry%20Potter%20Magical%20Chambers%20Map.png');
             background-size: contain;
             background-repeat: no-repeat;
-            background-position: center;
+            background-position: center center;
             width: 100%;
             max-width: 1400px;
-            height: 900px;
+            min-height: 600px;
+            height: 80vh;
             position: relative;
             filter: brightness(1.1);
+            margin: 0 auto;
         }
 
         .hotspot {
@@ -257,7 +261,8 @@
             50% { transform: translateY(-15px); }
         }
 
-        .hotspot:hover {
+        .hotspot:hover,
+        .hotspot:active {
             animation: none;
             transform: scale(1.3) translateY(-10px);
         }
@@ -296,7 +301,8 @@
             }
         }
 
-        .hotspot:hover .gem-icon {
+        .hotspot:hover .gem-icon,
+        .hotspot:active .gem-icon {
             animation: gemSparkle 0.6s ease-in-out infinite;
             filter: drop-shadow(0 0 50px rgba(34, 197, 94, 1)) brightness(2);
         }
@@ -525,6 +531,13 @@
             border-radius: 5px;
         }
 
+        @media (max-width: 1024px) {
+            .map-container {
+                height: 70vh;
+                min-height: 500px;
+            }
+        }
+
         @media (max-width: 768px) {
             .opening-title { font-size: 32px; padding: 0 15px; }
             .slogan { font-size: 18px; padding: 0 15px; }
@@ -534,16 +547,22 @@
             .play-text { font-size: 18px; }
             .music-control { top: 15px; right: 15px; width: 50px; height: 50px; }
             .music-control i { font-size: 20px; }
-            .map-container { height: 600px; }
-            .hotspot { width: 70px; height: 70px; }
-            .gem-icon { font-size: 45px; }
-            .gem-glow { width: 85px; height: 85px; }
-            .click-me-text { font-size: 8px; margin-top: 5px; }
-            #hotspot1 { top: 12%; left: 15%; }
-            #hotspot2 { top: 12%; right: 15%; }
-            #hotspot3 { top: 48%; right: 15%; }
-            #hotspot4 { bottom: 15%; right: 15%; }
-            #hotspot5 { bottom: 15%; left: 15%; }
+            
+            .map-wrapper { padding: 5px; min-height: 100vh; }
+            .map-container { height: 90vh; min-height: 500px; width: 100%; background-size: contain; background-position: center center; }
+            
+            .hotspot { width: 60px; height: 60px; }
+            .gem-icon { font-size: 40px; }
+            .gem-glow { width: 75px; height: 75px; }
+            .click-me-text { font-size: 7px; margin-top: 3px; }
+            
+            #hotspot1 { top: 15%; left: 18%; }
+            #hotspot2 { top: 15%; right: 18%; }
+            #hotspot3 { top: 50%; right: 18%; }
+            #hotspot4 { bottom: 20%; right: 18%; }
+            #hotspot5 { bottom: 20%; left: 18%; }
+            #hotspot6 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+            
             .parchment-scroll { padding: 30px 20px; border: 5px solid #4a3b2a; }
             .parchment-title { font-size: 24px; }
             .chamber-image { height: 180px; }
@@ -556,14 +575,28 @@
         @media (max-width: 480px) {
             .opening-title { font-size: 24px; }
             .slogan { font-size: 16px; }
-            .map-container { height: 450px; }
-            .hotspot { width: 60px; height: 60px; }
-            .gem-icon { font-size: 35px; }
-            .gem-glow { width: 70px; height: 70px; }
-            .click-me-text { font-size: 7px; }
+            .map-wrapper { padding: 2px; }
+            .map-container { height: 85vh; min-height: 450px; }
+            
+            .hotspot { width: 50px; height: 50px; }
+            .gem-icon { font-size: 32px; }
+            .gem-glow { width: 60px; height: 60px; }
+            .click-me-text { font-size: 6px; }
+            
+            #hotspot1 { top: 16%; left: 16%; }
+            #hotspot2 { top: 16%; right: 16%; }
+            #hotspot3 { top: 50%; right: 16%; }
+            #hotspot4 { bottom: 22%; right: 16%; }
+            #hotspot5 { bottom: 22%; left: 16%; }
+            
             .parchment-title { font-size: 20px; }
             .section-heading { font-size: 16px; }
             .parchment-content { font-size: 13px; }
+        }
+
+        @media (max-width: 926px) and (orientation: landscape) {
+            .map-container { height: 95vh; min-height: 400px; }
+            .map-wrapper { padding: 5px; }
         }
     </style>
 </head>
@@ -584,7 +617,7 @@
 <div class="magical-bg"></div>
 
 <div class="video-opening" id="videoOpening">
-    <video id="openingVideo">
+    <video id="openingVideo" playsinline>
         <source src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/Begin_the_scene_202512030725_lc26h.mp4" type="video/mp4">
     </video>
     
