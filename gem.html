@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chamber of Knowledge - Interactive CV Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Crimson Text', serif;
+            color: #2a1a11;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .magical-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0a 100%);
+            z-index: -1;
+        }
+
+        .video-opening {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        .video-opening.hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        .video-opening video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2002;
+        }
+
+        .play-overlay.hidden {
+            display: none;
+        }
+
+        .play-icon {
+            font-size: 100px;
+            color: #d4af37;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .play-text {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+        }
+
+        .skip-video-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 10px 25px;
+            background: rgba(212, 175, 55, 0.8);
+            color: #1a1a2e;
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            border: 2px solid #d4af37;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2001;
+        }
+
+        .skip-video-btn:hover {
+            background: #d4af37;
+            transform: scale(1.05);
+        }
+
+        .music-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #d4af37;
+            border: 3px solid #b8941f;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .music-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 1);
+        }
+
+        .music-control i {
+            font-size: 24px;
+            color: #1a1a2e;
+        }
+
+        .opening-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 1s ease;
+            padding: 20px;
+        }
+
+        .opening-screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .opening-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .opening-title {
+            font-family: 'Cinzel', serif;
+            font-size: 48px;
+            color: #d4af37;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+            animation: glow 2s ease-in-out infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+            50% { text-shadow: 0 0 40px rgba(212, 175, 55, 1); }
+        }
+
+        .slogan {
+            font-family: 'Crimson Text', serif;
+            font-size: 28px;
+            font-style: italic;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 0 20px;
+        }
+
+        .enter-btn {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            padding: 15px 40px;
+            background: #d4af37;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        .enter-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 1);
+        }
+
+        .map-wrapper {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .map-container {
+            background-image: url('https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/Harry%20Potter%20Magical%20Chambers%20Map.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 100%;
+            max-width: 1400px;
+            height: 900px;
+            position: relative;
+            filter: brightness(1.1);
+        }
+
+        .hotspot {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: gemFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes gemFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .hotspot:hover {
+            animation: none;
+            transform: scale(1.3) translateY(-10px);
+        }
+
+        .gem-icon {
+            font-size: 70px;
+            color: #22c55e;
+            filter: drop-shadow(0 0 20px rgba(34, 197, 94, 1));
+            text-shadow: 
+                0 0 10px rgba(34, 197, 94, 1),
+                0 0 20px rgba(34, 197, 94, 0.8),
+                0 0 30px rgba(34, 197, 94, 0.6),
+                0 0 40px rgba(34, 197, 94, 0.4),
+                0 0 70px rgba(34, 197, 94, 0.2),
+                0 0 100px rgba(34, 197, 94, 0.1);
+            animation: gemShine 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes gemShine {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(34, 197, 94, 1)) brightness(1);
+                transform: rotateY(0deg);
+            }
+            25% {
+                filter: drop-shadow(0 0 30px rgba(34, 197, 94, 1)) brightness(1.3);
+                transform: rotateY(10deg);
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(34, 197, 94, 1)) brightness(1.5);
+                transform: rotateY(0deg);
+            }
+            75% {
+                filter: drop-shadow(0 0 30px rgba(34, 197, 94, 1)) brightness(1.3);
+                transform: rotateY(-10deg);
+            }
+        }
+
+        .hotspot:hover .gem-icon {
+            animation: gemSparkle 0.6s ease-in-out infinite;
+            filter: drop-shadow(0 0 50px rgba(34, 197, 94, 1)) brightness(2);
+        }
+
+        @keyframes gemSparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .gem-glow {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, transparent 70%);
+            animation: pulseGlow 2s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(34, 197, 94, 0.6),
+                            0 0 40px rgba(34, 197, 94, 0.4),
+                            inset 0 0 20px rgba(34, 197, 94, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(34, 197, 94, 1),
+                            0 0 80px rgba(34, 197, 94, 0.6),
+                            inset 0 0 30px rgba(34, 197, 94, 0.5);
+            }
+        }
+
+        .click-me-text {
+            margin-top: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #86efac;
+            text-transform: uppercase;
+            text-align: center;
+            white-space: nowrap;
+            text-shadow: 
+                0 0 10px rgba(134, 239, 172, 1),
+                0 0 20px rgba(134, 239, 172, 0.8);
+            animation: textBlink 1.5s ease-in-out infinite;
+        }
+
+        @keyframes textBlink {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        #hotspot1 { top: 15%; left: 20%; }
+        #hotspot2 { top: 15%; right: 20%; }
+        #hotspot3 { top: 50%; right: 20%; }
+        #hotspot4 { bottom: 18%; right: 20%; }
+        #hotspot5 { bottom: 18%; left: 20%; }
+        #hotspot6 { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        .parchment-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 10px;
+        }
+
+        .parchment-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .parchment-scroll {
+            background: linear-gradient(to bottom, #f5e6d3 0%, #e6d7c3 100%);
+            border: 10px solid #4a3b2a;
+            border-radius: 10px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 50px 40px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            transform: scale(0.7);
+            transition: transform 0.5s ease;
+        }
+
+        .parchment-overlay.active .parchment-scroll {
+            transform: scale(1);
+            animation: unroll 0.6s ease-out;
+        }
+
+        @keyframes unroll {
+            0% { transform: scaleY(0) scaleX(0.8); }
+            100% { transform: scaleY(1) scaleX(1); }
+        }
+
+        .chamber-image {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            margin: 0 auto 30px;
+            border: 5px solid #4a3b2a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .chamber-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .parchment-title {
+            font-family: 'Cinzel', serif;
+            font-size: 36px;
+            color: #5c0e0e;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px double #5c0e0e;
+            padding-bottom: 15px;
+        }
+
+        .parchment-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #2a1a11;
+        }
+
+        .parchment-section {
+            margin-bottom: 25px;
+        }
+
+        .section-heading {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: #5c0e0e;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-heading i {
+            color: #d4af37;
+        }
+
+        .parchment-content ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .parchment-content li::before {
+            content: "⚡";
+            margin-right: 10px;
+            color: #d4af37;
+        }
+
+        .parchment-content strong {
+            color: #5c0e0e;
+        }
+
+        .snitch-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 12px 30px;
+            background: #d4af37;
+            color: #1a1a2e;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            font-weight: 700;
+            border: 3px solid #b8941f;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.6);
+        }
+
+        .snitch-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 1);
+        }
+
+        .snitch-btn i {
+            margin-left: 10px;
+        }
+
+        .portrait-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px double #4a3b2a;
+            overflow: hidden;
+            margin: 0 auto 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        }
+
+        .portrait-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            filter: sepia(20%);
+        }
+
+        .parchment-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .parchment-scroll::-webkit-scrollbar-track {
+            background: #d4c5a2;
+        }
+
+        .parchment-scroll::-webkit-scrollbar-thumb {
+            background: #4a3b2a;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .opening-title { font-size: 32px; padding: 0 15px; }
+            .slogan { font-size: 18px; padding: 0 15px; }
+            .enter-btn { font-size: 16px; padding: 12px 30px; }
+            .skip-video-btn { bottom: 15px; right: 15px; font-size: 12px; padding: 8px 20px; }
+            .play-icon { font-size: 70px; }
+            .play-text { font-size: 18px; }
+            .music-control { top: 15px; right: 15px; width: 50px; height: 50px; }
+            .music-control i { font-size: 20px; }
+            .map-container { height: 600px; }
+            .hotspot { width: 70px; height: 70px; }
+            .gem-icon { font-size: 45px; }
+            .gem-glow { width: 85px; height: 85px; }
+            .click-me-text { font-size: 8px; margin-top: 5px; }
+            #hotspot1 { top: 12%; left: 15%; }
+            #hotspot2 { top: 12%; right: 15%; }
+            #hotspot3 { top: 48%; right: 15%; }
+            #hotspot4 { bottom: 15%; right: 15%; }
+            #hotspot5 { bottom: 15%; left: 15%; }
+            .parchment-scroll { padding: 30px 20px; border: 5px solid #4a3b2a; }
+            .parchment-title { font-size: 24px; }
+            .chamber-image { height: 180px; }
+            .portrait-container { width: 120px; height: 120px; }
+            .section-heading { font-size: 18px; }
+            .parchment-content { font-size: 14px; }
+            .snitch-btn { font-size: 14px; padding: 10px 25px; }
+        }
+
+        @media (max-width: 480px) {
+            .opening-title { font-size: 24px; }
+            .slogan { font-size: 16px; }
+            .map-container { height: 450px; }
+            .hotspot { width: 60px; height: 60px; }
+            .gem-icon { font-size: 35px; }
+            .gem-glow { width: 70px; height: 70px; }
+            .click-me-text { font-size: 7px; }
+            .parchment-title { font-size: 20px; }
+            .section-heading { font-size: 16px; }
+            .parchment-content { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+<audio id="mapMusic" loop>
+    <source src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/magic-mystery-harry-potter-music-320643.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="doorCreakSound">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_4de63d98b0.mp3" type="audio/mpeg">
+</audio>
+
+<div class="music-control" id="musicControl" onclick="toggleMusic()">
+    <i class="fas fa-volume-up" id="musicIcon"></i>
+</div>
+
+<div class="magical-bg"></div>
+
+<div class="video-opening" id="videoOpening">
+    <video id="openingVideo">
+        <source src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/Begin_the_scene_202512030725_lc26h.mp4" type="video/mp4">
+    </video>
+    
+    <div class="play-overlay" id="playOverlay" onclick="playVideo()">
+        <i class="fas fa-play-circle play-icon"></i>
+        <div class="play-text">Click to Begin</div>
+    </div>
+    
+    <button class="skip-video-btn" onclick="skipVideo()">Skip Intro</button>
+</div>
+
+<div class="opening-screen" id="openingScreen">
+    <h1 class="opening-title">The Chamber of Knowledge</h1>
+    <p class="slogan">"Knowledge is the Golden Snitch; Hard Work is the Broomstick."</p>
+    <button class="enter-btn" onclick="enterMap()">
+        <i class="fas fa-map-marked-alt"></i> My Map of Milestones
+    </button>
+</div>
+
+<div class="map-wrapper" id="mapWrapper" style="display: none;">
+    <div class="map-container">
+        <div class="hotspot" id="hotspot1" onclick="openChamber(1)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+
+        <div class="hotspot" id="hotspot2" onclick="openChamber(3)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+
+        <div class="hotspot" id="hotspot3" onclick="openChamber(2)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+
+        <div class="hotspot" id="hotspot4" onclick="openChamber(4)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+
+        <div class="hotspot" id="hotspot5" onclick="openChamber(5)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+
+        <div class="hotspot" id="hotspot6" onclick="openChamber(6)">
+            <div class="gem-glow"></div>
+            <i class="fas fa-gem gem-icon"></i>
+            <div class="click-me-text">Click Me</div>
+        </div>
+    </div>
+</div>
+
+<!-- Chamber 1: Identity -->
+<div class="parchment-overlay" id="chamber1">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/1.png" alt="Chamber of Identity">
+        </div>
+        
+        <div class="portrait-container">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Global-Voices/main/Instructor's%20Photo.jpeg" alt="Abir Ahmed">
+        </div>
+        
+        <h2 class="parchment-title">The Chamber of Identity</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-user"></i> Name</div>
+                <p><strong>ABIR AHMED ALY WAFA</strong></p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-briefcase"></i> Title</div>
+                <p>Innovative EdTech Leader & Instructional Designer</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-address-card"></i> Contact Information</div>
+                <p>📍 Alexandria, Egypt<br>
+                📞 +20 11 0478 2680<br>
+                ✉️ abeerahmedwafa@gmail.com<br>
+                💼 linkedin.com/in/abeer-wafa</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-graduation-cap"></i> Education</div>
+                <ul>
+                    <li><strong>Master of Business & Management</strong> - R.B College (In Progress, 2025-2026)</li>
+                    <li><strong>B.A. English Language</strong> - Ain Shams University</li>
+                </ul>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-star"></i> Key Skills</div>
+                <p>Instructional Design • AI in Education • Leadership • Curriculum Development • Teacher Training</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-scroll"></i> Profile Summary</div>
+                <p>Educational leader, EdTech specialist, instructional designer, and <strong>Certified AI Trainer for Teachers (Edulixa)</strong> with <strong>20+ years of comprehensive experience across Egypt and Kuwait</strong>. A <strong>CELTA-certified English teacher</strong> and <strong>IB PYP educator</strong> with a strong track record in teaching, teacher training, and academic leadership. Highly skilled in AI integration, digital transformation, curriculum design, and professional development. Recognized for building technology-enhanced learning ecosystems, modernizing instructional practices, and delivering structured, AI-driven training programs for educators. Currently serving as <strong>Head of EdTech & Instructional Design</strong>.</p>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(1)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Chamber 2: Present Services -->
+<div class="parchment-overlay" id="chamber2">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/2.png" alt="Chamber of Present Services">
+        </div>
+        
+        <h2 class="parchment-title">The Chamber of Present Services</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-briefcase"></i> Current Role</div>
+                <p><strong>Head of EdTech & Instructional Design</strong><br>
+                <em>Monglish International Academy / Edulixa</em><br>
+                📅 Dec 2025 – Present</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-trophy"></i> Key Achievements</div>
+                <ul>
+                    <li>Leading AI adoption and digital transformation across all tracks</li>
+                    <li>Designing AI-based professional development programs for teachers</li>
+                    <li>Overseeing modernization of instructional materials for all ages</li>
+                    <li>Driving instructional innovation and EdTech ecosystem development</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(2)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Chamber 3: Leadership -->
+<div class="parchment-overlay" id="chamber3">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/3.png" alt="Chamber of Leadership">
+        </div>
+        
+        <h2 class="parchment-title">The Chamber of Leadership</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-chess-queen"></i> Leadership Role</div>
+                <p><strong>Assistant Principal & Head of Planning</strong><br>
+                <em>Previous Role</em><br>
+                📅 Nov 2024 – Nov 2025</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-award"></i> Key Achievements</div>
+                <ul>
+                    <li>Led online observations and provided improvement-focused feedback</li>
+                    <li>Implemented personalized action plans for teacher growth</li>
+                    <li>Delivered PD workshops on tools for active, student-centred learning</li>
+                    <li><strong>Trained teachers to use coaching techniques and mindset to enable their students to overcome affective barriers and become better speakers</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(3)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Chamber 4: Teaching & Curriculum -->
+<div class="parchment-overlay" id="chamber4">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/4.png" alt="Teaching & Curriculum Mastery">
+        </div>
+        
+        <h2 class="parchment-title">Teaching & Curriculum Mastery</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-chalkboard-teacher"></i> English Teacher (IGCSE)</div>
+                <p><strong>Salahaldin International School</strong><br>
+                📅 Nov 2021 – Nov 2024</p>
+                <ul>
+                    <li>Delivered IGCSE (0058) curriculum using interactive pedagogy</li>
+                    <li>Designed differentiated lesson plans and AI-powered tasks</li>
+                    <li>Delivered CPD workshops on AI and digital learning tools</li>
+                </ul>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-university"></i> English Teacher (CEFR Framework)</div>
+                <p><strong>Ministry of Education, Kuwait</strong><br>
+                📅 Aug 2004 – Sep 2021</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-crown"></i> Head of English Department</div>
+                <p><strong>Global Teaching - Private Institution</strong><br>
+                <em>Ministry of Education, Kuwait</em><br>
+                📅 Aug 2004 – Sep 2021</p>
+                <ul>
+                    <li>Co-designed official national English textbooks for Years 1–5</li>
+                    <li>Trained 200+ teachers via Technopad digital initiative</li>
+                    <li>Presented televised MOE lessons nationwide</li>
+                    <li><strong>Leadership:</strong> Guided teachers through effective curriculum delivery and mentorship</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(4)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Chamber 5: Enchantments (Certifications) -->
+<div class="parchment-overlay" id="chamber5">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/5.png" alt="Chamber of Enchantments">
+        </div>
+        
+        <h2 class="parchment-title">The Chamber of Enchantments</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-gem"></i> Core Competencies</div>
+                <p>Educational Leadership • Digital Transformation • SEL Implementation • Dept. Management • AI Integration • Quality Assurance • IGCSE, PYP & CEFR Frameworks • EdTech Tools • Data-Driven Instruction</p>
+            </div>
+
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-certificate"></i> Key Certifications</div>
+                <ul>
+                    <li><strong>IB PYP Program Workshop Series</strong> - Notting Hill College (2025)</li>
+                    <li><strong>Cambridge Primary Checkpoint CPD Standard Office</strong> - Cambridge (2024)</li>
+                    <li><strong>Creative Instructional Designer Diploma</strong> (2024)</li>
+                    <li><strong>CATBIS Advanced Teaching Techniques</strong> - Nottingham College, UK (2024)</li>
+                    <li><strong>Certified AI Trainer</strong> - Edulixa (2024)</li>
+                    <li><strong>CELTA</strong> - Cambridge University, UK (2023)</li>
+                    <li><strong>IELTS</strong> - British Council (2023)</li>
+                    <li><strong>TKT</strong> - Cambridge University, UK (2006)</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(5)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Chamber 6: Hidden Rooms (Projects) -->
+<div class="parchment-overlay" id="chamber6">
+    <div class="parchment-scroll">
+        <div class="chamber-image">
+            <img src="https://raw.githubusercontent.com/Abeerahmedwafa123/Mental-Math-/main/6.png" alt="Chamber of Hidden Rooms">
+        </div>
+        
+        <h2 class="parchment-title">The Chamber of Hidden Rooms</h2>
+        
+        <div class="parchment-content">
+            <div class="parchment-section">
+                <div class="section-heading"><i class="fas fa-lightbulb"></i> Projects & Achievements</div>
+                <ul>
+                    <li><strong>AI-Powered Speaking Platform:</strong> Aligned with UN Global Goals & IB frameworks</li>
+                    <li><strong>Digitalized Lesson Planners:</strong> Created AI-powered planners for CELTA & IB PYP</li>
+                    <li><strong>Business English Web App:</strong> Built app to improve workplace fluency</li>
+                    <li><strong>Creative Teaching Award (2013-14):</strong> For interactive phonics e-book</li>
+                    <li><strong>Instructional Quality:</strong> Improved via AI-supported PD programs</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="snitch-btn" onclick="closeChamber(6)">
+            Return to Map <i class="fas fa-basketball-ball"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    let musicPlaying = false;
+    const mapMusic = document.getElementById('mapMusic');
+    const doorSound = document.getElementById('doorCreakSound');
+    const musicIcon = document.getElementById('musicIcon');
+    const musicControl = document.getElementById('musicControl');
+    const video = document.getElementById('openingVideo');
+    const videoOpening = document.getElementById('videoOpening');
+    const playOverlay = document.getElementById('playOverlay');
+    const openingScreen = document.getElementById('openingScreen');
+
+    function playVideo() {
+        video.play();
+        playOverlay.classList.add('hidden');
+    }
+
+    video.addEventListener('ended', function() {
+        showTitleScreen();
+    });
+
+    function skipVideo() {
+        video.pause();
+        video.currentTime = 0;
+        showTitleScreen();
+    }
+
+    function showTitleScreen() {
+        video.pause();
+        videoOpening.classList.add('hidden');
+        openingScreen.classList.add('active');
+    }
+
+    function enterMap() {
+        video.pause();
+        video.currentTime = 0;
+        
+        doorSound.play();
+        
+        mapMusic.play().then(function() {
+            musicPlaying = true;
+            musicIcon.className = 'fas fa-volume-up';
+            musicControl.style.display = 'flex';
+        }).catch(function(error) {
+            console.log('Music error:', error);
+        });
+        
+        openingScreen.classList.add('hidden');
+        setTimeout(() => {
+            document.getElementById('mapWrapper').style.display = 'flex';
+        }, 1000);
+    }
+
+    function toggleMusic() {
+        if (musicPlaying) {
+            mapMusic.pause();
+            musicIcon.className = 'fas fa-volume-mute';
+            musicPlaying = false;
+        } else {
+            mapMusic.play();
+            musicIcon.className = 'fas fa-volume-up';
+            musicPlaying = true;
+        }
+    }
+
+    function openChamber(chamberNum) {
+        doorSound.play();
+        const chamber = document.getElementById(`chamber${chamberNum}`);
+        chamber.classList.add('active');
+    }
+
+    function closeChamber(chamberNum) {
+        const chamber = document.getElementById(`chamber${chamberNum}`);
+        chamber.classList.remove('active');
+    }
+
+    document.querySelectorAll('.parchment-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.classList.remove('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
